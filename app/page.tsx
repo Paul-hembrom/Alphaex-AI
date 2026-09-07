@@ -93,31 +93,6 @@ export default function HomePage() {
   const [currentGeneration, setCurrentGeneration] = useState<TTSGenerationResult | null>(null);
   const [generationHistory, setGenerationHistory] = useState<TTSGenerationResult[]>([]);
 
-  useEffect(() => {
-    let active = true;
-    generateNepaliTTS({
-      text: PRESET_PROMPTS[1].text,
-      voiceId: 'amrita',
-      pacingMultiplier: 1.0,
-      temperature: 0.35,
-      repetitionPenalty: 1.15,
-      topK: 50,
-    })
-      .then((initialResult) => {
-        if (active) {
-          setCurrentGeneration(initialResult);
-          setGenerationHistory([initialResult]);
-        }
-      })
-      .catch((e) => {
-        console.error('Initial synthesis setup failed:', e);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
   const selectedVoice = useMemo(() => {
     return INDIC_VOICES.find((v) => v.id === selectedVoiceId) || INDIC_VOICES[0];
   }, [selectedVoiceId]);

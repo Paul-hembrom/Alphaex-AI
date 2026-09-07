@@ -85,9 +85,10 @@ export default function AudioPlayerWithKaraoke({
       audioRef.current.pause();
       audioRef.current.src = generation.audioBlobUrl;
       audioRef.current.playbackRate = playbackRate;
+      audioRef.current.volume = isMuted ? 0 : volume;
       audioRef.current.currentTime = 0;
     }
-  }, [generation, playbackRate]);
+  }, [generation, playbackRate, isMuted, volume]);
 
   const togglePlayPause = () => {
     if (!audioRef.current || !generation) return;
@@ -172,14 +173,30 @@ export default function AudioPlayerWithKaraoke({
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!generation?.audioBlobUrl) return;
-    const anchor = document.createElement('a');
-    anchor.href = generation.audioBlobUrl;
-    anchor.download = `alphanex-nepali-tts-${generation.voice.nameEn.toLowerCase()}-${Date.now()}.wav`;
-    document.body.appendChild(anchor);
-    anchor.click();
-    document.body.removeChild(anchor);
+    const filename = generation.id.endsWith('.wav') ? generation.id : `${generation.id}.wav`;
+
+    try {
+      const response = await fetch(generation.audioBlobUrl);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = blobUrl;
+      anchor.download = filename;
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      // Direct blob link fallback
+      const anchor = document.createElement('a');
+      anchor.href = generation.audioBlobUrl;
+      anchor.download = filename;
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
+    }
   };
 
   const handleCopyText = () => {
@@ -243,7 +260,9 @@ export default function AudioPlayerWithKaraoke({
                   <span>MMS Forced Alignment</span>
                 </>
               ) : (
-                <span>MMS Speech Alignment Matrix</span>
+                <span className="text-slate-400">
+                  {lang === 'ne' ? 'अडियो उत्पन्न भएको छैन' : 'No audio generated yet'}
+                </span>
               )}
             </p>
           </div>
@@ -423,18 +442,49 @@ export default function AudioPlayerWithKaraoke({
                 <RotateCcw className="w-3 h-3" />
               </button>
 
-              {/* Volume Mute */}
+              {/* Download Icon Button */}
               <button
-                onClick={toggleMute}
-                className="text-slate-500 hover:text-white cursor-pointer transition-colors"
-                title="Mute/Unmute"
+                onClick={handleDownload}
+                disabled={!generation}
+                id="download-audio-icon-button"
+                className="text-slate-500 hover:text-[#10b981] cursor-pointer transition-colors disabled:opacity-25 disabled:pointer-events-none p-0.5 rounded hover:bg-white/5"
+                title={lang === 'ne' ? 'अडियो डाउनलोड गर्नुहोस्' : `Download (${generation?.id || 'audio'}.wav)`}
+                aria-label="Download Audio"
               >
-                {isMuted || volume === 0 ? (
-                  <VolumeX className="w-3.5 h-3.5 text-rose-400" />
-                ) : (
-                  <Volume2 className="w-3.5 h-3.5" />
-                )}
+                <Download className="w-3.5 h-3.5" />
               </button>
+
+              {/* Volume Control (Mute Toggle + Slider) */}
+              <div className="flex items-center gap-1.5 pl-1.5 border-l border-slate-800/80">
+                <button
+                  onClick={toggleMute}
+                  id="audio-volume-toggle-btn"
+                  className="text-slate-500 hover:text-white cursor-pointer transition-colors p-0.5 rounded"
+                  title={isMuted ? 'Unmute' : 'Mute'}
+                  aria-label={isMuted ? 'Unmute' : 'Mute'}
+                >
+                  {isMuted || volume === 0 ? (
+                    <VolumeX className="w-3.5 h-3.5 text-rose-400" />
+                  ) : (
+                    <Volume2 className="w-3.5 h-3.5" />
+                  )}
+                </button>
+                <input
+                  type="range"
+                  id="audio-volume-slider"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={isMuted ? 0 : volume}
+                  onChange={handleVolumeChange}
+                  className="w-14 sm:w-20 h-1 bg-slate-800 rounded-full appearance-none cursor-pointer accent-[#10b981] focus:outline-none"
+                  title={`Volume: ${Math.round((isMuted ? 0 : volume) * 100)}%`}
+                  aria-label="Audio playback volume slider"
+                />
+                <span className="text-[9px] font-mono text-slate-500 w-6 text-right select-none hidden sm:inline">
+                  {Math.round((isMuted ? 0 : volume) * 100)}%
+                </span>
+              </div>
             </div>
           </div>
         </div>
