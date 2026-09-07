@@ -1,0 +1,6 @@
+{
+  "name": "Alphanex AI (अल्फानेक्स AI)",
+  "description": "Ultra-modern Indic & Nepali speech synthesis studio, voice cloning lab, and developer API platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
