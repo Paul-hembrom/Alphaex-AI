@@ -218,7 +218,7 @@ export default function AudioPlayerWithKaraoke({
   const progressRatio = duration > 0 ? currentTime / duration : 0;
 
   return (
-    <div id="audio-player-workbench" className="bg-gradient-to-b from-[#111622] to-[#0a0d14] rounded-2xl border border-slate-800/80 p-5 md:p-6 shadow-2xl relative overflow-hidden flex flex-col">
+    <div id="audio-player-workbench" className="bg-white rounded-3xl border border-stone-200/80 p-5 md:p-6 shadow-editorial relative overflow-hidden flex flex-col transition-all">
       <audio
         ref={audioRef}
         onEnded={() => {
@@ -228,39 +228,39 @@ export default function AudioPlayerWithKaraoke({
         preload="auto"
       />
 
-      {/* Background neon ambient highlight */}
-      <div className="absolute -right-20 -top-20 w-56 h-56 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -left-20 -bottom-20 w-56 h-56 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+      {/* Atmospheric Soft Gradient Orbs behind player canvas */}
+      <div className="absolute -right-20 -top-20 w-56 h-56 bg-[#a7e5d3] opacity-25 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -left-20 -bottom-20 w-56 h-56 bg-[#f4c5a8] opacity-20 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Header bar of Player: REAL-TIME SYNC ENGINE */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
+      {/* Header bar of Player */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-stone-200/70">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-[#10b981]/10 border border-[#10b981]/30 flex items-center justify-center text-[#10b981]">
-            <Radio className={`w-4 h-4 ${isPlaying ? 'animate-pulse text-[#10b981]' : ''}`} />
+          <div className="w-8 h-8 rounded-full bg-stone-100 border border-stone-200/80 flex items-center justify-center text-stone-800 shadow-xs">
+            <Radio className={`w-3.5 h-3.5 ${isPlaying ? 'animate-pulse text-stone-950' : 'text-stone-500'}`} />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-semibold text-slate-300 uppercase tracking-wider">
+              <span className="text-xs font-mono font-medium text-stone-800 tracking-wider uppercase">
                 REAL-TIME SYNC ENGINE
               </span>
-              <div className="flex gap-1 items-end h-4 ml-1">
-                <div className={`w-1 h-2.5 bg-[#06b6d4] ${isPlaying ? 'animate-pulse' : 'opacity-40'}`} />
-                <div className={`w-1 h-4 bg-[#06b6d4] ${isPlaying ? 'animate-pulse delay-75' : ''}`} />
-                <div className={`w-1 h-2 bg-[#10b981] ${isPlaying ? 'animate-pulse delay-150' : ''}`} />
-                <div className={`w-1 h-5 bg-[#10b981] ${isPlaying ? 'animate-pulse delay-100' : ''}`} />
+              <div className="flex gap-0.5 items-end h-3 ml-1">
+                <div className={`w-0.5 h-2 bg-stone-800 ${isPlaying ? 'animate-pulse' : 'opacity-30'}`} />
+                <div className={`w-0.5 h-3 bg-stone-800 ${isPlaying ? 'animate-pulse delay-75' : 'opacity-40'}`} />
+                <div className={`w-0.5 h-1.5 bg-stone-800 ${isPlaying ? 'animate-pulse delay-150' : 'opacity-20'}`} />
+                <div className={`w-0.5 h-2.5 bg-stone-800 ${isPlaying ? 'animate-pulse delay-100' : 'opacity-30'}`} />
               </div>
             </div>
-            <p className="text-[11px] text-slate-500 font-mono mt-0.5 flex items-center gap-2">
+            <p className="text-[11px] text-stone-500 font-mono mt-0.5 flex items-center gap-2">
               {generation ? (
                 <>
-                  <span className="text-slate-300 font-medium">{generation.voice.nameNe}</span>
+                  <span className="text-stone-800 font-medium">{generation.voice.nameNe}</span>
                   <span>•</span>
                   <span>{generation.charactersUsed} {lang === 'ne' ? 'अक्षर' : 'chars'}</span>
                   <span>•</span>
                   <span>MMS Forced Alignment</span>
                 </>
               ) : (
-                <span className="text-slate-400">
+                <span className="text-stone-400">
                   {lang === 'ne' ? 'अडियो उत्पन्न भएको छैन' : 'No audio generated yet'}
                 </span>
               )}
@@ -274,16 +274,16 @@ export default function AudioPlayerWithKaraoke({
             <button
               onClick={handleCopyText}
               id="copy-transcript-button"
-              className="text-xs px-3 py-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-300 flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="text-xs px-3 py-1 rounded-full bg-stone-100 hover:bg-stone-200/80 border border-stone-200/80 text-stone-700 flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               {isCopied ? (
                 <>
-                  <Check className="w-3.5 h-3.5 text-[#10b981]" />
+                  <Check className="w-3.5 h-3.5 text-stone-950" />
                   <span>{lang === 'ne' ? 'प्रतिलिपि भयो' : 'Copied'}</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-3.5 h-3.5 text-[#06b6d4]" />
+                  <Sparkles className="w-3.5 h-3.5 text-stone-600" />
                   <span>{lang === 'ne' ? 'पाठ प्रतिलिपि' : 'Copy Text'}</span>
                 </>
               )}
@@ -291,7 +291,7 @@ export default function AudioPlayerWithKaraoke({
             <button
               onClick={handleDownload}
               id="download-audio-button"
-              className="text-xs px-3.5 py-1.5 rounded-lg bg-[#10b981] hover:bg-emerald-400 text-slate-950 font-bold flex items-center gap-1.5 shadow-[0_0_15px_rgba(16,185,129,0.35)] transition-all cursor-pointer"
+              className="text-xs px-4 py-1.5 rounded-full bg-stone-900 hover:bg-black text-stone-50 font-medium flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" />
               <span>{lang === 'ne' ? '.WAV डाउनलोड' : 'Download .WAV'}</span>
@@ -300,10 +300,10 @@ export default function AudioPlayerWithKaraoke({
         )}
       </div>
 
-      {/* Main Karaoke Display with Immersive Glowing Typography */}
+      {/* Main Karaoke Display with Editorial Typography */}
       <div className="py-4">
         {generation ? (
-          <div className="p-5 rounded-xl bg-[#0a0d14]/80 border border-slate-800/80 leading-relaxed text-xl md:text-2xl font-medium flex flex-wrap gap-x-3 gap-y-2 max-h-56 overflow-y-auto select-none">
+          <div className="p-5 rounded-2xl bg-stone-50/90 border border-stone-200/70 leading-relaxed text-xl md:text-2xl font-normal flex flex-wrap gap-x-2.5 gap-y-2 max-h-56 overflow-y-auto select-none text-stone-800">
             {generation.timestamps.map((item, idx) => {
               const isActive = idx === activeWordIndex;
               const isPast = currentTime > item.end;
@@ -313,12 +313,12 @@ export default function AudioPlayerWithKaraoke({
                   key={idx}
                   onClick={() => handleWordClick(item, idx)}
                   id={`karaoke-word-${idx}`}
-                  className={`cursor-pointer transition-all duration-150 rounded px-1.5 py-0.5 ${
+                  className={`cursor-pointer transition-all duration-150 rounded-md px-1.5 py-0.5 ${
                     isActive
-                      ? 'text-[#10b981] font-bold drop-shadow-[0_0_10px_rgba(16,185,129,0.4)] bg-[#10b981]/15 border border-[#10b981]/30 scale-105'
+                      ? 'text-stone-950 font-semibold bg-stone-200/90 border border-stone-300 shadow-xs scale-105'
                       : isPast
-                      ? 'text-[#06b6d4] opacity-90 drop-shadow-[0_0_8px_rgba(6,182,212,0.25)] hover:text-white'
-                      : 'text-slate-500 hover:text-slate-300'
+                      ? 'text-stone-800 opacity-95 hover:text-stone-950'
+                      : 'text-stone-400 hover:text-stone-700'
                   }`}
                   title={`${item.start}s - ${item.end}s (Click to seek)`}
                 >
@@ -328,9 +328,9 @@ export default function AudioPlayerWithKaraoke({
             })}
           </div>
         ) : (
-          <div className="p-8 rounded-xl bg-[#0a0d14]/40 border border-dashed border-slate-800 text-center text-slate-500 text-sm">
-            <Music className="w-7 h-7 mx-auto mb-2 text-slate-600 opacity-60" />
-            <p>
+          <div className="p-8 rounded-2xl bg-stone-50/70 border border-dashed border-stone-200 text-center text-stone-500 text-sm">
+            <Music className="w-6 h-6 mx-auto mb-2 text-stone-400" />
+            <p className="font-normal text-stone-500">
               {lang === 'ne'
                 ? 'माथि पाठ लेखी "ध्वनि उत्पन्न गर्नुहोस्" थिच्नुहोस्। यहाँ शब्द-शब्दको प्रत्यक्ष हाइलाइटिङ देखिनेछ।'
                 : 'Enter Devanagari text and click "Generate Nepali Audio" to see synchronized live word-level highlighting here.'}
@@ -340,7 +340,7 @@ export default function AudioPlayerWithKaraoke({
       </div>
 
       {/* Waveform Visualization Bars */}
-      <div className="my-2 p-3 rounded-xl bg-[#0a0d14]/70 border border-slate-800/60 relative">
+      <div className="my-2 p-3 rounded-2xl bg-stone-50/80 border border-stone-200/70 relative">
         <div className="flex items-end justify-between gap-1 h-14 px-2 select-none">
           {Array.from({ length: waveBarsCount }).map((_, idx) => {
             const barProgress = idx / waveBarsCount;
@@ -362,8 +362,8 @@ export default function AudioPlayerWithKaraoke({
                 }}
                 className={`flex-1 rounded-full transition-all duration-150 cursor-pointer ${
                   isPlayed
-                    ? 'bg-gradient-to-t from-[#10b981] to-[#06b6d4] shadow-[0_0_8px_rgba(16,185,129,0.5)]'
-                    : 'bg-slate-800/80 hover:bg-slate-700'
+                    ? 'bg-stone-900'
+                    : 'bg-stone-200 hover:bg-stone-300'
                 }`}
                 style={{
                   height: `${Math.min(100, pseudoHeight * dynamicScale)}%`,
@@ -377,19 +377,19 @@ export default function AudioPlayerWithKaraoke({
       </div>
 
       {/* Immersive Bottom Player Dock */}
-      <div className="mt-auto flex items-center gap-4 bg-black/40 p-3.5 rounded-xl border border-white/5">
+      <div className="mt-auto flex items-center gap-4 bg-stone-100/70 p-3 rounded-2xl border border-stone-200/80">
         {/* Play/Pause CTA */}
         <button
           onClick={togglePlayPause}
           disabled={!generation || isGenerating}
           id="audio-play-pause-btn"
-          className="w-10 h-10 rounded-full bg-[#10b981] hover:bg-emerald-400 text-black flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-transform active:scale-95 disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+          className="w-10 h-10 rounded-full bg-stone-900 hover:bg-black text-stone-50 flex items-center justify-center shrink-0 shadow-sm transition-transform active:scale-95 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
           aria-label={isPlaying ? 'Pause Audio' : 'Play Audio'}
         >
           {isPlaying ? (
-            <Pause className="w-5 h-5 fill-black text-black" />
+            <Pause className="w-4 h-4 fill-stone-50 text-stone-50" />
           ) : (
-            <Play className="w-5 h-5 fill-black text-black translate-x-0.5" />
+            <Play className="w-4 h-4 fill-stone-50 text-stone-50 translate-x-0.5" />
           )}
         </button>
 
@@ -405,11 +405,11 @@ export default function AudioPlayerWithKaraoke({
               value={currentTime}
               onChange={handleSeek}
               disabled={!generation}
-              className="w-full h-1.5 bg-slate-800 rounded-full appearance-none cursor-pointer accent-[#10b981] focus:outline-none disabled:opacity-40"
+              className="w-full h-1.5 bg-stone-200 rounded-full appearance-none cursor-pointer accent-stone-900 focus:outline-none disabled:opacity-40"
             />
           </div>
           <div className="flex justify-between items-center mt-1.5">
-            <span className="text-[10px] font-mono text-slate-500">
+            <span className="text-[10px] font-mono text-stone-500">
               {formatTime(currentTime)} / {formatTime(duration)}
             </span>
             <div className="flex items-center gap-3">
@@ -420,10 +420,10 @@ export default function AudioPlayerWithKaraoke({
                     key={speed}
                     onClick={() => handleSpeedChange(speed)}
                     id={`playback-rate-${speed}x`}
-                    className={`text-[10px] font-mono cursor-pointer px-1 rounded transition-colors ${
+                    className={`text-[10px] font-mono cursor-pointer px-1.5 py-0.5 rounded-full transition-colors ${
                       playbackRate === speed
-                        ? 'text-[#10b981] font-bold'
-                        : 'text-slate-400 hover:text-slate-200'
+                        ? 'bg-stone-900 text-stone-50 font-medium'
+                        : 'text-stone-500 hover:text-stone-900 hover:bg-stone-200/60'
                     }`}
                   >
                     {speed}x
@@ -436,7 +436,7 @@ export default function AudioPlayerWithKaraoke({
                 onClick={handleRestart}
                 disabled={!generation}
                 id="audio-restart-btn"
-                className="text-slate-500 hover:text-white cursor-pointer transition-colors disabled:opacity-40"
+                className="text-stone-500 hover:text-stone-900 cursor-pointer transition-colors disabled:opacity-30 p-1 rounded-full hover:bg-stone-200/60"
                 title="Restart"
               >
                 <RotateCcw className="w-3 h-3" />
@@ -447,7 +447,7 @@ export default function AudioPlayerWithKaraoke({
                 onClick={handleDownload}
                 disabled={!generation}
                 id="download-audio-icon-button"
-                className="text-slate-500 hover:text-[#10b981] cursor-pointer transition-colors disabled:opacity-25 disabled:pointer-events-none p-0.5 rounded hover:bg-white/5"
+                className="text-stone-600 hover:text-stone-950 cursor-pointer transition-colors disabled:opacity-25 disabled:pointer-events-none p-1 rounded-full hover:bg-stone-200/60"
                 title={lang === 'ne' ? 'अडियो डाउनलोड गर्नुहोस्' : `Download (${generation?.id || 'audio'}.wav)`}
                 aria-label="Download Audio"
               >
@@ -455,18 +455,18 @@ export default function AudioPlayerWithKaraoke({
               </button>
 
               {/* Volume Control (Mute Toggle + Slider) */}
-              <div className="flex items-center gap-1.5 pl-1.5 border-l border-slate-800/80">
+              <div className="flex items-center gap-1.5 pl-1.5 border-l border-stone-200">
                 <button
                   onClick={toggleMute}
                   id="audio-volume-toggle-btn"
-                  className="text-slate-500 hover:text-white cursor-pointer transition-colors p-0.5 rounded"
+                  className="text-stone-500 hover:text-stone-900 cursor-pointer transition-colors p-1 rounded-full hover:bg-stone-200/60"
                   title={isMuted ? 'Unmute' : 'Mute'}
                   aria-label={isMuted ? 'Unmute' : 'Mute'}
                 >
                   {isMuted || volume === 0 ? (
-                    <VolumeX className="w-3.5 h-3.5 text-rose-400" />
+                    <VolumeX className="w-3.5 h-3.5 text-stone-400" />
                   ) : (
-                    <Volume2 className="w-3.5 h-3.5" />
+                    <Volume2 className="w-3.5 h-3.5 text-stone-700" />
                   )}
                 </button>
                 <input
@@ -477,11 +477,11 @@ export default function AudioPlayerWithKaraoke({
                   step="0.01"
                   value={isMuted ? 0 : volume}
                   onChange={handleVolumeChange}
-                  className="w-14 sm:w-20 h-1 bg-slate-800 rounded-full appearance-none cursor-pointer accent-[#10b981] focus:outline-none"
+                  className="w-14 sm:w-20 h-1.5 bg-stone-200 rounded-full appearance-none cursor-pointer accent-stone-900 focus:outline-none"
                   title={`Volume: ${Math.round((isMuted ? 0 : volume) * 100)}%`}
                   aria-label="Audio playback volume slider"
                 />
-                <span className="text-[9px] font-mono text-slate-500 w-6 text-right select-none hidden sm:inline">
+                <span className="text-[9px] font-mono text-stone-500 w-6 text-right select-none hidden sm:inline">
                   {Math.round((isMuted ? 0 : volume) * 100)}%
                 </span>
               </div>

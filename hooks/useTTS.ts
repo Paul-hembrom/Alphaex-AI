@@ -7,6 +7,7 @@ import {
   BackendVoiceId,
   SpeechResult,
 } from '@/lib/api-client';
+import { WordTimestamp } from '@/types/tts';
 
 export interface UseTTSOptions {
   initialApiKey?: string;
@@ -25,6 +26,7 @@ export interface UseTTSReturn {
   audioUrl: string | null;
   remainingCredits: number | null;
   duration: number;
+  timestamps: WordTimestamp[];
   error: string | null;
   handleGenerate: (
     text: string,
@@ -48,6 +50,7 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [remainingCredits, setRemainingCredits] = useState<number | null>(null);
   const [duration, setDuration] = useState<number>(0);
+  const [timestamps, setTimestamps] = useState<WordTimestamp[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   // Keep track of current Object URL for cleanup to prevent memory leaks
@@ -79,6 +82,7 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
     revokeCurrentAudio();
     setAudioUrl(null);
     setDuration(0);
+    setTimestamps([]);
     setError(null);
   }, [revokeCurrentAudio]);
 
@@ -121,6 +125,8 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
         if (result.remainingCredits !== null && !isNaN(result.remainingCredits)) {
           setRemainingCredits(result.remainingCredits);
         }
+
+        setTimestamps(result.timestamps);
 
         if (onSuccess) {
           onSuccess(result);
@@ -168,6 +174,7 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
     audioUrl,
     remainingCredits,
     duration,
+    timestamps,
     error,
     handleGenerate,
     refreshCredits,

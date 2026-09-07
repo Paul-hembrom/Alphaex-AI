@@ -23,39 +23,44 @@ export default function NavigationHeader({
   onOpenTopUp,
 }: NavigationHeaderProps) {
   return (
-    <nav className="h-14 border-b border-slate-800/80 bg-[#0d111b] sticky top-0 z-40 w-full flex items-center justify-between px-4 sm:px-6 select-none">
+    <nav className="h-14 border-b border-stone-200/80 bg-white/90 backdrop-blur-md sticky top-0 z-40 w-full flex items-center justify-between px-4 sm:px-6 select-none transition-colors">
       <div className="flex items-center gap-6 lg:gap-8">
-        {/* Brand Logo */}
+        {/* Brand Logo - ElevenLabs Minimalist Audio Mark */}
         <div
           onClick={() => onSelectTab('studio')}
           className="flex items-center gap-2.5 cursor-pointer group shrink-0"
         >
-          <div className="w-8 h-8 bg-[#10b981]/10 border border-[#10b981]/30 rounded-lg flex items-center justify-center transition-transform group-hover:scale-105">
+          <div className="w-8 h-8 bg-stone-900 text-stone-50 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 shadow-sm">
             <svg
-              className="w-5 h-5 text-[#10b981]"
+              className="w-4 h-4 text-stone-100"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2"
+              strokeWidth="2.2"
+              strokeLinecap="round"
             >
-              <path d="M12 3v18M8 8v8M4 11v2M16 10v4M20 12v0" />
+              <path d="M4 12h1M8 8v8M12 4v16M16 7v10M20 12h1" />
             </svg>
           </div>
-          <span className="font-bold text-lg tracking-tight text-white">
-            {lang === 'ne' ? 'अल्फानेक्स' : 'Alphanex'}{' '}
-            <span className="text-[#10b981]">AI</span>
-          </span>
+          <div className="flex items-baseline gap-1.5">
+            <span className="font-light text-base sm:text-lg tracking-tight text-stone-900">
+              {lang === 'ne' ? 'कथा' : 'Katha'}<span className="font-medium text-stone-950">AI</span>
+            </span>
+            <span className="text-[10px] uppercase font-mono tracking-widest text-stone-400 hidden sm:inline">
+              Alphanex
+            </span>
+          </div>
         </div>
 
         {/* Desktop Nav Items */}
-        <div className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-400 h-14">
+        <div className="hidden md:flex items-center gap-6 text-xs sm:text-sm font-normal text-stone-500 h-14 tracking-wide">
           <button
             onClick={() => onSelectTab('studio')}
             id="nav-tab-studio"
             className={`h-full flex items-center transition-colors cursor-pointer ${
               currentTab === 'studio'
-                ? 'text-white border-b-2 border-[#10b981]'
-                : 'hover:text-slate-200'
+                ? 'text-stone-950 font-medium border-b-2 border-stone-950'
+                : 'hover:text-stone-900'
             }`}
           >
             {lang === 'ne' ? 'स्टुडियो (Studio)' : 'Studio'}
@@ -66,8 +71,8 @@ export default function NavigationHeader({
             id="nav-tab-voicelab"
             className={`h-full flex items-center transition-colors cursor-pointer ${
               currentTab === 'voicelab'
-                ? 'text-white border-b-2 border-[#10b981]'
-                : 'hover:text-slate-200'
+                ? 'text-stone-950 font-medium border-b-2 border-stone-950'
+                : 'hover:text-stone-900'
             }`}
           >
             {lang === 'ne' ? 'भ्वाइस ल्याब (Voice Lab)' : 'Voice Lab'}
@@ -78,8 +83,8 @@ export default function NavigationHeader({
             id="nav-tab-developer"
             className={`h-full flex items-center transition-colors cursor-pointer ${
               currentTab === 'developer'
-                ? 'text-white border-b-2 border-[#10b981]'
-                : 'hover:text-slate-200'
+                ? 'text-stone-950 font-medium border-b-2 border-stone-950'
+                : 'hover:text-stone-900'
             }`}
           >
             {lang === 'ne' ? 'डेभलपर एपीआई (Dev API)' : 'Dev API'}
@@ -90,8 +95,8 @@ export default function NavigationHeader({
             id="nav-tab-pricing"
             className={`h-full flex items-center transition-colors cursor-pointer ${
               currentTab === 'pricing'
-                ? 'text-white border-b-2 border-[#10b981]'
-                : 'hover:text-slate-200'
+                ? 'text-stone-950 font-medium border-b-2 border-stone-950'
+                : 'hover:text-stone-900'
             }`}
           >
             {lang === 'ne' ? 'मूल्य तथा योजना (Pricing)' : 'Pricing'}
@@ -100,17 +105,17 @@ export default function NavigationHeader({
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center gap-3">
-        {/* Credits Badge */}
+      <div className="flex items-center gap-2 sm:gap-3">
+        {/* Credits Badge - Tactile Pill */}
         <div
           onClick={onOpenTopUp}
           id="credits-pill-badge"
-          className="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-800 cursor-pointer hover:border-slate-700 transition-colors"
+          className="flex items-center gap-2 bg-stone-100 hover:bg-stone-200/70 px-3 py-1 rounded-full border border-stone-200/80 cursor-pointer transition-colors"
           title="Click to top up character quota"
         >
-          <div className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse" />
-          <span className="text-xs font-mono text-slate-300">
-            {creditsRemaining.toLocaleString()} / {(creditsTotal / 1000).toFixed(0)}k Chars
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-xs font-mono text-stone-700">
+            {creditsRemaining.toLocaleString()} / {(creditsTotal / 1000).toFixed(0)}k
           </span>
           <button
             onClick={(e) => {
@@ -118,19 +123,19 @@ export default function NavigationHeader({
               onOpenTopUp();
             }}
             id="header-topup-btn"
-            className="ml-1 text-[10px] font-bold bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 hover:bg-emerald-500/25 transition-colors cursor-pointer"
+            className="text-[10px] font-medium bg-stone-900 hover:bg-black text-stone-50 px-2 py-0.5 rounded-full transition-colors cursor-pointer"
           >
             TOP UP
           </button>
         </div>
 
-        <div className="h-6 w-px bg-slate-800 hidden sm:block mx-1" />
+        <div className="h-4 w-px bg-stone-200 hidden sm:block mx-0.5" />
 
         {/* Bilingual Switcher */}
         <button
           onClick={onToggleLang}
           id="bilingual-language-toggle"
-          className="text-xs font-bold bg-slate-800 text-slate-200 px-3 py-1.5 rounded-md hover:bg-slate-700 transition-colors cursor-pointer border border-slate-700/50"
+          className="text-xs font-medium bg-stone-100 hover:bg-stone-200 text-stone-700 px-3 py-1 rounded-full border border-stone-200/80 transition-colors cursor-pointer"
           title="Switch UI language (नेपाली / EN)"
         >
           {lang === 'ne' ? 'नेपाली' : 'EN'}
@@ -139,9 +144,11 @@ export default function NavigationHeader({
         {/* Profile Avatar */}
         <div
           onClick={onOpenTopUp}
-          className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#06b6d4] to-[#10b981] border border-white/10 shrink-0 cursor-pointer shadow-sm hover:ring-2 hover:ring-emerald-500/40 transition-all"
+          className="w-8 h-8 rounded-full bg-stone-900 text-stone-100 flex items-center justify-center text-xs font-medium border border-stone-300 shadow-sm cursor-pointer hover:ring-2 hover:ring-stone-400 transition-all shrink-0"
           title="Account Status: Creator Tier"
-        />
+        >
+          K
+        </div>
       </div>
     </nav>
   );

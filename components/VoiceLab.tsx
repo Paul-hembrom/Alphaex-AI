@@ -160,15 +160,15 @@ export default function VoiceLab({
   return (
     <div id="voice-lab-module" className="space-y-8">
       {/* Module Title Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-stone-200/80">
         <div>
-          <h2 className="text-xl md:text-2xl font-bold text-slate-100 flex items-center gap-2.5">
-            <span className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-              <Sparkles className="w-5 h-5" />
+          <h2 className="text-xl md:text-2xl font-light tracking-tight text-stone-900 flex items-center gap-2.5">
+            <span className="p-1.5 rounded-xl bg-stone-100 text-stone-800 border border-stone-200 shadow-xs">
+              <Sparkles className="w-4 h-4 text-stone-700" />
             </span>
-            {lang === 'ne' ? 'भ्वाइस ल्याब र शून्य-नमूना क्लोनिङ' : 'Voice Lab & Indic-Parler Cloning Hub'}
+            <span>{lang === 'ne' ? 'भ्वाइस ल्याब र शून्य-नमूना क्लोनिङ' : 'Voice Lab & Indic-Parler Cloning Hub'}</span>
           </h2>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-stone-500 mt-1 font-normal">
             {lang === 'ne'
               ? '१५ सेकेन्डको अडियोबाट नयाँ नेपाली आवाज क्लोन गर्नुहोस् वा प्राकृतिक भाषा प्रम्प्टद्वारा विशिष्ट लवज तयार गर्नुहोस्।'
               : 'Clone custom Nepali voices in 15 seconds or construct zero-shot Indic-Parler speaker embeddings with pure natural language.'}
@@ -176,23 +176,23 @@ export default function VoiceLab({
         </div>
 
         <div className="flex items-center gap-2 self-start md:self-auto">
-          <span className="text-xs px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 flex items-center gap-1.5 font-mono">
-            <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
+          <span className="text-xs px-3.5 py-1 rounded-full bg-stone-100 text-stone-700 border border-stone-200 flex items-center gap-1.5 font-mono shadow-xs">
+            <ShieldCheck className="w-3.5 h-3.5 text-stone-800" />
             MMS + Indic-Parler v1.2
           </span>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Instant Voice Clone Card (5 cols) */}
+        {/* Left Column: Instant Voice Clone Card (6 cols) */}
         <div className="lg:col-span-6 space-y-6">
-          <div className="bg-[#111622] rounded-2xl border border-slate-800/80 p-5 md:p-6 shadow-xl relative overflow-hidden">
+          <div className="bg-white rounded-3xl border border-stone-200/80 p-5 md:p-6 shadow-editorial relative overflow-hidden">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-slate-100 text-base flex items-center gap-2">
-                <Mic className="w-4 h-4 text-emerald-400" />
+              <h3 className="font-medium text-stone-900 text-base flex items-center gap-2">
+                <Mic className="w-4 h-4 text-stone-800" />
                 {lang === 'ne' ? 'तुरुन्त आवाज क्लोनिङ (Instant Voice Clone)' : 'Instant 1-Click Voice Clone'}
               </h3>
-              <span className="text-[11px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 font-mono">
+              <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-600 border border-stone-200 font-mono">
                 {lang === 'ne' ? 'न्यूनतम १५ सेकेन्ड' : 'Min 15s Required'}
               </span>
             </div>
@@ -201,10 +201,10 @@ export default function VoiceLab({
             <div
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleFileDrop}
-              className={`border-2 border-dashed rounded-xl p-6 text-center transition-all ${
+              className={`border-2 border-dashed rounded-2xl p-6 text-center transition-all ${
                 selectedFile
-                  ? 'border-emerald-500/50 bg-emerald-500/5'
-                  : 'border-slate-800 hover:border-cyan-500/50 hover:bg-slate-900/50'
+                  ? 'border-stone-400 bg-stone-50'
+                  : 'border-stone-200 hover:border-stone-400 hover:bg-stone-50/60'
               }`}
             >
               <input
@@ -217,21 +217,21 @@ export default function VoiceLab({
 
               {selectedFile ? (
                 <div className="space-y-3">
-                  <div className="w-12 h-12 mx-auto rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                  <div className="w-12 h-12 mx-auto rounded-full bg-stone-100 text-stone-800 border border-stone-200 flex items-center justify-center">
                     <FileAudio className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="font-medium text-slate-200 text-sm truncate max-w-[280px] mx-auto">
+                    <p className="font-medium text-stone-900 text-sm truncate max-w-[280px] mx-auto">
                       {selectedFile.name}
                     </p>
-                    <p className="text-xs text-slate-400 mt-0.5 font-mono">
+                    <p className="text-xs text-stone-500 mt-0.5 font-mono">
                       {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB • {sampleDuration}s audio
                     </p>
                   </div>
 
                   {/* 15-second compliance badge */}
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-                    <Check className="w-3.5 h-3.5" />
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-stone-100 text-stone-800 border border-stone-200">
+                    <Check className="w-3.5 h-3.5 text-stone-950" />
                     {lang === 'ne'
                       ? 'पर्याप्त अडियो नमूना (१५ सेकेन्ड भन्दा बढी)'
                       : 'Sample length valid (>15s speaker fingerprint)'}
@@ -240,7 +240,7 @@ export default function VoiceLab({
                   <div>
                     <label
                       htmlFor="voice-sample-upload"
-                      className="text-xs text-cyan-400 hover:underline cursor-pointer"
+                      className="text-xs text-stone-600 hover:text-stone-900 hover:underline cursor-pointer"
                     >
                       {lang === 'ne' ? 'अर्को फाइल छान्नुहोस्' : 'Replace with another file'}
                     </label>
@@ -251,16 +251,16 @@ export default function VoiceLab({
                   htmlFor="voice-sample-upload"
                   className="cursor-pointer block space-y-3"
                 >
-                  <div className="w-12 h-12 mx-auto rounded-full bg-slate-800/80 text-slate-400 flex items-center justify-center border border-slate-700/60">
-                    <Upload className="w-6 h-6" />
+                  <div className="w-12 h-12 mx-auto rounded-full bg-stone-100 text-stone-500 flex items-center justify-center border border-stone-200">
+                    <Upload className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-slate-200">
+                    <p className="text-sm font-medium text-stone-800">
                       {lang === 'ne'
                         ? 'अडियो फाइल यहाँ तान्नुहोस् वा अपलोड गर्नुहोस्'
                         : 'Drag & drop speaker audio, or browse'}
                     </p>
-                    <p className="text-xs text-slate-500 mt-1">
+                    <p className="text-xs text-stone-400 mt-1">
                       {lang === 'ne'
                         ? 'समर्थित ढाँचा: .wav, .mp3 (न्यूनतम १५ सेकेन्ड प्रस्ट बोली)'
                         : 'Supported formats: .wav, .mp3, .m4a (min 15s clean speech)'}
@@ -273,7 +273,7 @@ export default function VoiceLab({
             {/* Clone Details inputs */}
             <div className="mt-4 space-y-3">
               <div>
-                <label className="text-xs text-slate-400 block mb-1">
+                <label className="text-xs text-stone-600 block mb-1 font-medium">
                   {lang === 'ne' ? 'आवाजको नाम (Voice Clone Name)' : 'Voice Clone Name'}
                 </label>
                 <input
@@ -281,7 +281,7 @@ export default function VoiceLab({
                   value={cloneName}
                   onChange={(e) => setCloneName(e.target.value)}
                   placeholder={lang === 'ne' ? 'उदा. सुलभ - पोडकास्ट आवाज' : 'e.g. Sulav - Podcast Host'}
-                  className="w-full text-sm px-3.5 py-2.5 rounded-lg bg-slate-900/90 border border-slate-800 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-500/60"
+                  className="w-full text-sm px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-400 focus:bg-white"
                 />
               </div>
 
@@ -289,7 +289,7 @@ export default function VoiceLab({
                 onClick={handleStartCloning}
                 disabled={!selectedFile || isCloning}
                 id="clone-voice-submit-btn"
-                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                className="w-full py-3 rounded-full bg-stone-900 hover:bg-black text-stone-50 font-medium text-sm shadow-sm flex items-center justify-center gap-2 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
               >
                 {isCloning ? (
                   <>
@@ -307,10 +307,10 @@ export default function VoiceLab({
           </div>
 
           {/* Active Custom Clones List */}
-          <div className="bg-[#111622] rounded-2xl border border-slate-800/80 p-5 shadow-xl">
-            <h4 className="text-sm font-semibold text-slate-300 mb-3 flex items-center justify-between">
+          <div className="bg-white rounded-3xl border border-stone-200/80 p-5 shadow-editorial">
+            <h4 className="text-sm font-medium text-stone-900 mb-3 flex items-center justify-between">
               <span>{lang === 'ne' ? 'तपाईंका क्लोन गरिएका आवाजहरू' : 'Your Custom Voice Clones'}</span>
-              <span className="text-xs text-slate-500 font-mono">{clones.length} Ready</span>
+              <span className="text-xs text-stone-400 font-mono">{clones.length} Ready</span>
             </h4>
 
             <div className="space-y-2.5">
@@ -319,23 +319,23 @@ export default function VoiceLab({
                 return (
                   <div
                     key={c.id}
-                    className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 flex items-center justify-between gap-3 transition-colors"
+                    className="p-3.5 rounded-2xl bg-stone-50/70 border border-stone-200/80 hover:border-stone-300 flex items-center justify-between gap-3 transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => toggleAudition(c.id)}
-                        className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
+                        className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors shadow-xs ${
                           isPlaying
-                            ? 'bg-emerald-500 text-slate-950'
-                            : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                            ? 'bg-stone-900 text-stone-50'
+                            : 'bg-white text-stone-700 border border-stone-200 hover:bg-stone-100'
                         }`}
                         title="Audition Sample"
                       >
-                        {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 translate-x-0.5" />}
+                        {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 translate-x-0.5" />}
                       </button>
                       <div>
-                        <p className="text-sm font-medium text-slate-200">{c.name}</p>
-                        <p className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5 font-mono">
+                        <p className="text-sm font-medium text-stone-900">{c.name}</p>
+                        <p className="text-xs text-stone-500 flex items-center gap-1.5 mt-0.5 font-mono">
                           <span>{c.dialect}</span>
                           <span>•</span>
                           <span>{c.durationRecorded}s sample</span>
@@ -350,7 +350,7 @@ export default function VoiceLab({
                           c.name
                         )
                       }
-                      className="text-xs px-2.5 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center gap-1 transition-colors"
+                      className="text-xs px-3 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-200 flex items-center gap-1 font-medium transition-colors cursor-pointer"
                     >
                       <span>{lang === 'ne' ? 'स्टुडियोमा प्रयोग' : 'Use in Studio'}</span>
                       <ArrowRight className="w-3 h-3" />
@@ -364,18 +364,18 @@ export default function VoiceLab({
 
         {/* Right Column: Indic-Parler Prompt Synthesizer (6 cols) */}
         <div className="lg:col-span-6 space-y-6">
-          <div className="bg-[#111622] rounded-2xl border border-slate-800/80 p-5 md:p-6 shadow-xl relative">
+          <div className="bg-white rounded-3xl border border-stone-200/80 p-5 md:p-6 shadow-editorial relative">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-slate-100 text-base flex items-center gap-2">
-                <Sliders className="w-4 h-4 text-cyan-400" />
+              <h3 className="font-medium text-stone-900 text-base flex items-center gap-2">
+                <Sliders className="w-4 h-4 text-stone-800" />
                 {lang === 'ne' ? 'इन्डिक-पार्लर प्रम्प्ट सिन्थेसाइजर' : 'Indic-Parler Natural Prompt Designer'}
               </h3>
-              <span className="text-[11px] px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20 font-mono">
+              <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-700 border border-stone-200 font-mono">
                 Zero-Shot Synthesis
               </span>
             </div>
 
-            <p className="text-xs text-slate-400 mb-4">
+            <p className="text-xs text-stone-500 mb-4 font-normal">
               {lang === 'ne'
                 ? 'विभिन्न विशेषताहरू छान्नुहोस्; एआईले स्वतः उच्च स्तरको प्राविधिक विवरण तयार गर्नेछ।'
                 : 'Select characteristics below; Indic-Parler synthesizes a precise vocal identity on the fly.'}
@@ -384,26 +384,26 @@ export default function VoiceLab({
             <div className="space-y-4">
               {/* Speaker Gender */}
               <div>
-                <label className="text-xs font-medium text-slate-400 block mb-2">
+                <label className="text-xs font-medium text-stone-600 block mb-2">
                   {lang === 'ne' ? 'लैङ्गिक पहिचान (Speaker Gender)' : 'Speaker Gender'}
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => setGenderPrompt('female')}
-                    className={`py-2 px-3 rounded-lg text-xs font-medium transition-all ${
+                    className={`py-2 px-3 rounded-full text-xs font-medium transition-all cursor-pointer ${
                       genderPrompt === 'female'
-                        ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20'
-                        : 'bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-700'
+                        ? 'bg-stone-900 text-stone-50 shadow-xs'
+                        : 'bg-stone-100 border border-stone-200 text-stone-700 hover:bg-stone-200/70'
                     }`}
                   >
                     {lang === 'ne' ? 'महिला (Female Voice)' : 'Female Voice'}
                   </button>
                   <button
                     onClick={() => setGenderPrompt('male')}
-                    className={`py-2 px-3 rounded-lg text-xs font-medium transition-all ${
+                    className={`py-2 px-3 rounded-full text-xs font-medium transition-all cursor-pointer ${
                       genderPrompt === 'male'
-                        ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20'
-                        : 'bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-700'
+                        ? 'bg-stone-900 text-stone-50 shadow-xs'
+                        : 'bg-stone-100 border border-stone-200 text-stone-700 hover:bg-stone-200/70'
                     }`}
                   >
                     {lang === 'ne' ? 'पुरुष (Male Voice)' : 'Male Voice'}
@@ -413,7 +413,7 @@ export default function VoiceLab({
 
               {/* Tone / Emotion */}
               <div>
-                <label className="text-xs font-medium text-slate-400 block mb-2">
+                <label className="text-xs font-medium text-stone-600 block mb-2">
                   {lang === 'ne' ? 'स्वरको भाव तथा शैली (Vocal Tone & Emotion)' : 'Vocal Tone & Emotion'}
                 </label>
                 <div className="flex flex-wrap gap-1.5">
@@ -421,10 +421,10 @@ export default function VoiceLab({
                     <button
                       key={t.id}
                       onClick={() => setSelectedTone(t.id)}
-                      className={`text-xs px-3 py-1.5 rounded-lg transition-all ${
+                      className={`text-xs px-3 py-1.5 rounded-full transition-all cursor-pointer ${
                         selectedTone === t.id
-                          ? 'bg-cyan-500 text-slate-950 font-semibold shadow-sm'
-                          : 'bg-slate-900/90 text-slate-400 border border-slate-800 hover:text-slate-200'
+                          ? 'bg-stone-900 text-stone-50 font-medium shadow-xs'
+                          : 'bg-stone-100 text-stone-700 border border-stone-200 hover:bg-stone-200/70'
                       }`}
                     >
                       {lang === 'ne' ? t.labelNe : t.labelEn}
@@ -435,7 +435,7 @@ export default function VoiceLab({
 
               {/* Regional Dialect / Accent */}
               <div>
-                <label className="text-xs font-medium text-slate-400 block mb-2">
+                <label className="text-xs font-medium text-stone-600 block mb-2">
                   {lang === 'ne' ? 'क्षेत्रीय लवज (Regional Dialect & Accent)' : 'Regional Dialect & Accent'}
                 </label>
                 <div className="flex flex-wrap gap-1.5">
@@ -443,10 +443,10 @@ export default function VoiceLab({
                     <button
                       key={d.id}
                       onClick={() => setSelectedDialect(d.id)}
-                      className={`text-xs px-3 py-1.5 rounded-lg transition-all ${
+                      className={`text-xs px-3 py-1.5 rounded-full transition-all cursor-pointer ${
                         selectedDialect === d.id
-                          ? 'bg-cyan-500 text-slate-950 font-semibold shadow-sm'
-                          : 'bg-slate-900/90 text-slate-400 border border-slate-800 hover:text-slate-200'
+                          ? 'bg-stone-900 text-stone-50 font-medium shadow-xs'
+                          : 'bg-stone-100 text-stone-700 border border-stone-200 hover:bg-stone-200/70'
                       }`}
                     >
                       {lang === 'ne' ? d.labelNe : d.labelEn}
@@ -457,7 +457,7 @@ export default function VoiceLab({
 
               {/* Room Acoustics */}
               <div>
-                <label className="text-xs font-medium text-slate-400 block mb-2">
+                <label className="text-xs font-medium text-stone-600 block mb-2">
                   {lang === 'ne' ? 'ध्वनि परिवेश (Acoustic Environment)' : 'Acoustic Environment'}
                 </label>
                 <div className="flex flex-wrap gap-1.5">
@@ -465,10 +465,10 @@ export default function VoiceLab({
                     <button
                       key={a.id}
                       onClick={() => setSelectedAcoustic(a.id)}
-                      className={`text-xs px-3 py-1.5 rounded-lg transition-all ${
+                      className={`text-xs px-3 py-1.5 rounded-full transition-all cursor-pointer ${
                         selectedAcoustic === a.id
-                          ? 'bg-cyan-500 text-slate-950 font-semibold shadow-sm'
-                          : 'bg-slate-900/90 text-slate-400 border border-slate-800 hover:text-slate-200'
+                          ? 'bg-stone-900 text-stone-50 font-medium shadow-xs'
+                          : 'bg-stone-100 text-stone-700 border border-stone-200 hover:bg-stone-200/70'
                       }`}
                     >
                       {lang === 'ne' ? a.labelNe : a.labelEn}
@@ -479,10 +479,10 @@ export default function VoiceLab({
 
               {/* Generated Prompt Box */}
               <div className="pt-2">
-                <label className="text-xs font-medium text-slate-400 block mb-1">
+                <label className="text-xs font-medium text-stone-600 block mb-1">
                   {lang === 'ne' ? 'उत्पन्न इन्डिक-पार्लर कन्डिसनिङ प्रम्प्ट:' : 'Generated Indic-Parler Conditioning String:'}
                 </label>
-                <div className="p-3.5 rounded-xl bg-[#0a0d14] border border-slate-800 text-xs font-mono text-cyan-300 leading-relaxed break-words">
+                <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 text-xs font-mono text-stone-800 leading-relaxed break-words">
                   &ldquo;{dynamicParlerPrompt}&rdquo;
                 </div>
               </div>
@@ -496,7 +496,7 @@ export default function VoiceLab({
                   )
                 }
                 id="apply-parler-prompt-btn"
-                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-sm shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                className="w-full py-3 rounded-full bg-stone-900 hover:bg-black text-stone-50 font-medium text-sm shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
               >
                 <Layers className="w-4 h-4" />
                 <span>{lang === 'ne' ? 'यो प्रम्प्ट स्टुडियोमा लोड गर्नुहोस्' : 'Load Prompt into Studio'}</span>

@@ -44,7 +44,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ne" className={`${inter.variable} ${mukta.variable} ${notoSansDevanagari.variable}`}>
-      <body className="bg-[#0a0d14] text-slate-100 antialiased selection:bg-emerald-500/30 selection:text-emerald-300 min-h-screen" suppressHydrationWarning>
+      <body className="bg-[#fafaf9] text-stone-900 antialiased selection:bg-stone-900 selection:text-stone-50 min-h-screen relative font-sans" suppressHydrationWarning>
         {children}
       </body>
     </html>

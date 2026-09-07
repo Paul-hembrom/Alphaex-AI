@@ -106,27 +106,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Forward stream directly
-    const remainingCredits = upstreamRes.headers.get('x-remaining-credits') || '';
-    const totalDuration = upstreamRes.headers.get('x-total-duration') || '';
-
-    const headers = new Headers();
-    headers.set('Content-Type', 'audio/wav');
-    if (remainingCredits) {
-      headers.set('X-Remaining-Credits', remainingCredits);
-    }
-    if (totalDuration) {
-      headers.set('X-Total-Duration', totalDuration);
-    }
-    headers.set(
-      'Access-Control-Expose-Headers',
-      'X-Remaining-Credits, X-Total-Duration'
-    );
-
-    return new Response(upstreamRes.body, {
-      status: 200,
-      headers,
-    });
+    // Parse JSON response from backend containing audio_base64, duration, remaining_credits, timestamps
+    const data = await upstreamRes.json();
+    return NextResponse.json(data);
   } catch (err: unknown) {
     const isAbort =
       err instanceof Error &&

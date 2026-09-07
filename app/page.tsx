@@ -11,7 +11,6 @@ import {
   PRESET_PROMPTS,
   convertToDevanagariNumerals,
   generateNepaliTTS,
-  extractWords,
 } from '@/lib/audioSynthesis';
 import {
   generateSpeech,
@@ -145,28 +144,18 @@ export default function HomePage() {
         temperature,
       });
 
-      // Calculate forced alignment timestamps for real audio
-      const words = extractWords(inputText);
-      const totalWords = Math.max(1, words.length);
       const audioDuration =
         speechRes.duration && speechRes.duration > 0
           ? speechRes.duration
-          : Math.max(1.2, parseFloat((totalWords * 0.42).toFixed(2)));
-
-      const timePerWord = (audioDuration - 0.1) / totalWords;
-      let cur = 0.05;
-      const timestamps = words.map((w) => {
-        const start = parseFloat(cur.toFixed(3));
-        const end = parseFloat((cur + timePerWord).toFixed(3));
-        cur = end + 0.02;
-        return { word: w, start, end };
-      });
+          : speechRes.timestamps.length > 0
+          ? speechRes.timestamps[speechRes.timestamps.length - 1].end
+          : 0;
 
       const liveResult: TTSGenerationResult = {
         id: `syn_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
         audioBlobUrl: speechRes.audioUrl,
         duration: audioDuration,
-        timestamps,
+        timestamps: speechRes.timestamps,
         charactersUsed: inputText.length,
         tokensCount: tokenEstimate,
         createdAt: new Date().toLocaleTimeString([], {
@@ -180,7 +169,7 @@ export default function HomePage() {
       setCurrentGeneration(liveResult);
       setGenerationHistory((prev) => [liveResult, ...prev.slice(0, 9)]);
 
-      // Update remaining credits from X-Remaining-Credits header if returned
+      // Update remaining credits from response body if returned
       if (typeof speechRes.remainingCredits === 'number') {
         setCreditsRemaining(speechRes.remainingCredits);
       } else {
@@ -236,17 +225,22 @@ export default function HomePage() {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-[#0a0d14] flex items-center justify-center text-slate-400 font-mono text-sm">
+      <div className="min-h-screen bg-[#fafaf9] flex items-center justify-center text-stone-500 font-mono text-sm">
         <div className="flex items-center gap-3">
-          <span className="w-3 h-3 rounded-full bg-emerald-400 animate-ping" />
-          <span>लोडिङ कथा AI (Initializing Alphanex Indic Studio)...</span>
+          <span className="w-2.5 h-2.5 rounded-full bg-stone-900 animate-ping" />
+          <span>लोडिङ कथा AI (Initializing KathaAI Indic Studio)...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0d14] text-slate-100 flex flex-col selection:bg-emerald-500/30 selection:text-emerald-200">
+    <div className="min-h-screen bg-[#fafaf9] text-stone-900 flex flex-col selection:bg-stone-900 selection:text-stone-50 relative overflow-x-hidden font-sans">
+      {/* Background Soft Atmospheric Gradients (ElevenLabs Signature Aesthetic) */}
+      <div className="fixed top-[-10%] left-[-5%] w-[45vw] h-[45vw] rounded-full bg-[#a7e5d3] opacity-25 blur-3xl pointer-events-none -z-10" />
+      <div className="fixed top-[20%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-[#f4c5a8] opacity-20 blur-3xl pointer-events-none -z-10" />
+      <div className="fixed bottom-[-10%] left-[20%] w-[45vw] h-[45vw] rounded-full bg-[#c8b8e0] opacity-20 blur-3xl pointer-events-none -z-10" />
+
       {/* Universal Navigation & Header */}
       <NavigationHeader
         currentTab={currentTab}
@@ -259,7 +253,7 @@ export default function HomePage() {
           }
         }}
         lang={lang}
-        onToggleLang={() => setLang((prev) => (prev === 'ne' ? 'en' : 'ne'))}
+        onToggleLang={() => setLang(lang === 'ne' ? 'en' : 'ne')}
         creditsRemaining={creditsRemaining}
         creditsTotal={creditsTotal}
         onOpenTopUp={() => {
@@ -274,15 +268,15 @@ export default function HomePage() {
         {currentTab === 'studio' && (
           <div id="studio-main-view" className="space-y-8 animate-fadeIn">
             {/* Top Intro Bar */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800/80">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-stone-200/80">
               <div>
-                <h1 className="text-xl md:text-2xl font-bold text-slate-100 flex items-center gap-2.5">
-                  <span className="p-2 rounded-xl bg-gradient-to-tr from-emerald-500/20 to-cyan-500/20 text-emerald-400 border border-emerald-500/30">
-                    <Sparkles className="w-5 h-5" />
+                <h1 className="text-xl md:text-2xl font-light tracking-tight text-stone-900 flex items-center gap-2.5">
+                  <span className="p-1.5 rounded-xl bg-stone-100 text-stone-800 border border-stone-200 shadow-xs">
+                    <Sparkles className="w-4 h-4 text-stone-700" />
                   </span>
-                  {lang === 'ne' ? 'नेपाली वाक् संश्लेषण स्टुडियो' : 'Nepali Speech Synthesis Studio'}
+                  <span>{lang === 'ne' ? 'नेपाली वाक् संश्लेषण स्टुडियो' : 'Nepali Speech Synthesis Studio'}</span>
                 </h1>
-                <p className="text-xs md:text-sm text-slate-400 mt-1">
+                <p className="text-xs md:text-sm text-stone-500 mt-1 font-normal">
                   {lang === 'ne'
                     ? 'इलेभेनल्याब्स सरहको शुद्ध नेपाली उच्चारण, सटीक भावभङ्गी र प्रत्यक्ष काराओके सबटाइटल।'
                     : 'ElevenLabs-grade expressive Indic synthesis, MMS forced alignment, and instant voice timbre customization.'}
@@ -291,7 +285,7 @@ export default function HomePage() {
 
               {/* Quick Preset Chips */}
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[11px] text-slate-500 font-mono mr-1">
+                <span className="text-[11px] text-stone-400 font-mono mr-1">
                   {lang === 'ne' ? 'नमुना पाठ:' : 'Presets:'}
                 </span>
                 {PRESET_PROMPTS.map((p) => (
@@ -299,7 +293,7 @@ export default function HomePage() {
                     key={p.id}
                     onClick={() => handlePastePreset(p.text)}
                     id={`preset-prompt-${p.id}`}
-                    className="text-xs px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 transition-colors"
+                    className="text-xs px-3 py-1 rounded-full bg-white hover:bg-stone-100 border border-stone-200/80 text-stone-700 shadow-xs transition-colors cursor-pointer"
                   >
                     {lang === 'ne' ? p.titleNe : p.titleEn}
                   </button>
@@ -312,10 +306,10 @@ export default function HomePage() {
               {/* Left Column: Input Textarea & Controls (7 cols) */}
               <div className="lg:col-span-7 space-y-6">
                 {/* Textarea Card */}
-                <div className="bg-[#111622] rounded-2xl border border-slate-800/80 p-5 md:p-6 shadow-xl relative focus-within:border-emerald-500/60 transition-colors">
+                <div className="bg-white rounded-3xl border border-stone-200/80 p-5 md:p-6 shadow-editorial relative focus-within:border-stone-400 transition-all">
                   <div className="flex items-center justify-between mb-3">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-[#10b981] shadow-[0_0_6px_#10b981]" />
+                    <label className="text-xs font-semibold uppercase tracking-wider text-stone-600 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-stone-800" />
                       {lang === 'ne' ? 'देवनागरी पाठ इनपुट' : 'Text Input (Devanagari)'}
                     </label>
 
@@ -324,7 +318,7 @@ export default function HomePage() {
                       <button
                         onClick={handleFormatNumerals}
                         id="convert-numerals-btn"
-                        className="text-[10px] bg-[#10b981]/15 text-[#10b981] px-2.5 py-1 rounded-md border border-[#10b981]/30 font-bold hover:bg-[#10b981]/25 flex items-center gap-1 transition-colors cursor-pointer"
+                        className="text-[11px] bg-stone-100 hover:bg-stone-200 text-stone-700 px-3 py-1 rounded-full border border-stone-200 font-medium flex items-center gap-1 transition-colors cursor-pointer"
                         title="Convert English numbers 0-9 to Devanagari ०-९"
                       >
                         <Wand2 className="w-3 h-3" />
@@ -333,7 +327,7 @@ export default function HomePage() {
 
                       <button
                         onClick={handleClearText}
-                        className="text-slate-500 hover:text-slate-300 p-1 rounded transition-colors"
+                        className="text-stone-400 hover:text-stone-700 p-1.5 rounded-full hover:bg-stone-100 transition-colors cursor-pointer"
                         title="Clear Text"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -353,34 +347,34 @@ export default function HomePage() {
                       }
                       rows={6}
                       id="nepali-tts-input-textarea"
-                      className="w-full bg-[#0a0d14]/90 text-slate-100 text-base md:text-lg rounded-xl p-4 pb-12 border border-slate-800/80 focus:outline-none focus:border-[#10b981]/60 focus:ring-1 focus:ring-[#10b981]/40 leading-relaxed resize-y placeholder-slate-600 font-sans"
+                      className="w-full bg-stone-50/70 text-stone-900 text-base md:text-lg rounded-2xl p-4 pb-12 border border-stone-200/80 focus:outline-none focus:border-stone-400 focus:bg-white leading-relaxed resize-y placeholder-stone-400 font-sans transition-all"
                     />
 
                     {/* Floating badge over bottom-right of textarea container */}
-                    <div className="absolute bottom-3 right-3 flex items-center gap-3 bg-slate-900/90 backdrop-blur px-3 py-1 rounded-lg border border-slate-700/50 shadow-lg pointer-events-none">
-                      <span className="text-[10px] font-mono text-slate-400 uppercase">
-                        Tokens: <strong className="text-slate-200">{tokenEstimate}</strong>
+                    <div className="absolute bottom-3 right-3 flex items-center gap-2.5 bg-white/90 backdrop-blur px-3 py-1 rounded-full border border-stone-200 shadow-xs pointer-events-none">
+                      <span className="text-[10px] font-mono text-stone-500 uppercase">
+                        Tokens: <strong className="text-stone-800">{tokenEstimate}</strong>
                       </span>
-                      <span className="text-[10px] font-mono text-[#10b981] uppercase font-semibold">
+                      <span className="text-[10px] font-mono text-stone-800 uppercase font-semibold">
                         Est: रू {(charCount * 0.005).toFixed(1)}
                       </span>
                     </div>
                   </div>
 
                   {/* Character & Token Counters */}
-                  <div className="mt-3 pt-3 border-t border-slate-800/60 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400 font-mono">
+                  <div className="mt-3 pt-3 border-t border-stone-100 flex flex-wrap items-center justify-between gap-2 text-xs text-stone-500 font-mono">
                     <div className="flex items-center gap-3">
                       <span>
-                        <strong className="text-slate-200">{charCount}</strong> {lang === 'ne' ? 'अक्षर' : 'chars'}
+                        <strong className="text-stone-800">{charCount}</strong> {lang === 'ne' ? 'अक्षर' : 'chars'}
                       </span>
-                      <span className="text-slate-600">•</span>
+                      <span className="text-stone-300">•</span>
                       <span>
-                        ~<strong className="text-slate-200">{tokenEstimate}</strong> {lang === 'ne' ? 'टोकन' : 'tokens'}
+                        ~<strong className="text-stone-800">{tokenEstimate}</strong> {lang === 'ne' ? 'टोकन' : 'tokens'}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-1 text-[#10b981]">
-                      <Zap className="w-3.5 h-3.5" />
+                    <div className="flex items-center gap-1 text-stone-700">
+                      <Zap className="w-3.5 h-3.5 text-stone-900" />
                       <span>
                         {lang === 'ne'
                           ? `क्रेडिट खपत: ${charCount} Chars`
@@ -391,13 +385,13 @@ export default function HomePage() {
                 </div>
 
                 {/* Voice Selection Card */}
-                <div className="bg-[#111622] rounded-2xl border border-slate-800/80 p-5 md:p-6 shadow-xl space-y-4">
+                <div className="bg-white rounded-3xl border border-stone-200/80 p-5 md:p-6 shadow-editorial space-y-4">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                      <Volume2 className="w-4 h-4 text-[#10b981]" />
+                    <label className="text-xs font-semibold uppercase tracking-wider text-stone-700 flex items-center gap-2">
+                      <Volume2 className="w-4 h-4 text-stone-900" />
                       {lang === 'ne' ? 'आवाज छनोट (Voice Selection)' : 'Speaker Profile'}
                     </label>
-                    <span className="text-xs text-slate-500 font-mono">
+                    <span className="text-xs text-stone-400 font-mono">
                       {INDIC_VOICES.length} Models Available
                     </span>
                   </div>
@@ -411,34 +405,38 @@ export default function HomePage() {
                           key={voice.id}
                           onClick={() => setSelectedVoiceId(voice.id)}
                           id={`voice-option-${voice.id}`}
-                          className={`p-3.5 rounded-xl border cursor-pointer transition-all relative overflow-hidden ${
+                          className={`p-3.5 rounded-2xl border cursor-pointer transition-all relative overflow-hidden ${
                             isSelected
-                              ? 'bg-gradient-to-br from-[#161f2e] to-[#111622] border-[#10b981]/80 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
-                              : 'bg-slate-900/60 border-slate-800 hover:border-slate-700 hover:bg-slate-900'
+                              ? 'bg-stone-50 border-stone-900 shadow-xs ring-1 ring-stone-900'
+                              : 'bg-white border-stone-200/80 hover:border-stone-300 hover:bg-stone-50/50'
                           }`}
                         >
                           <div className="flex items-start gap-3">
                             <div
-                              className="w-10 h-10 rounded-full bg-[#10b981]/15 border border-[#10b981]/30 flex items-center justify-center font-bold text-[#10b981] shadow-sm shrink-0"
+                              className={`w-9 h-9 rounded-full flex items-center justify-center font-medium shadow-xs shrink-0 ${
+                                isSelected
+                                  ? 'bg-stone-900 text-stone-50'
+                                  : 'bg-stone-100 text-stone-700 border border-stone-200'
+                              }`}
                             >
                               {voice.nameNe.slice(0, 1)}
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between gap-1">
-                                <p className="font-bold text-slate-100 text-sm truncate">
+                                <p className="font-medium text-stone-900 text-sm truncate">
                                   {voice.nameNe}{' '}
-                                  <span className="text-xs font-normal text-slate-400">
+                                  <span className="text-xs font-normal text-stone-400">
                                     ({voice.nameEn})
                                   </span>
                                 </p>
                                 {isSelected && (
-                                  <span className="w-2 h-2 rounded-full bg-[#10b981] shadow-[0_0_8px_#10b981]" />
+                                  <span className="w-1.5 h-1.5 rounded-full bg-stone-900" />
                                 )}
                               </div>
-                              <p className="text-xs text-[#10b981] mt-0.5 truncate font-medium">
+                              <p className="text-xs text-stone-600 mt-0.5 truncate font-medium">
                                 {lang === 'ne' ? voice.roleNe : voice.roleEn}
                               </p>
-                              <p className="text-[11px] text-slate-400 mt-1 line-clamp-2 leading-tight">
+                              <p className="text-[11px] text-stone-400 mt-1 line-clamp-2 leading-tight font-normal">
                                 {lang === 'ne' ? voice.descriptionNe : voice.descriptionEn}
                               </p>
                             </div>
@@ -450,9 +448,9 @@ export default function HomePage() {
 
                   {/* Custom Parler Prompt input if custom voice is selected */}
                   {selectedVoiceId === 'custom_indic_parler' && (
-                    <div className="p-4 rounded-xl bg-[#0a0d14] border border-cyan-500/40 animate-fadeIn space-y-2">
+                    <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 animate-fadeIn space-y-2">
                       <div className="flex items-center justify-between">
-                        <label className="text-xs font-medium text-cyan-300 flex items-center gap-1.5">
+                        <label className="text-xs font-medium text-stone-700 flex items-center gap-1.5">
                           <Layers className="w-3.5 h-3.5" />
                           {lang === 'ne'
                             ? 'इन्डिक-पार्लर शून्य-नमूना कन्डिसनिङ प्रम्प्ट'
@@ -460,7 +458,7 @@ export default function HomePage() {
                         </label>
                         <button
                           onClick={() => setCurrentTab('voicelab')}
-                          className="text-[11px] text-cyan-400 hover:underline"
+                          className="text-[11px] text-stone-600 hover:text-stone-950 underline"
                         >
                           {lang === 'ne' ? 'भ्वाइस ल्याबमा खोल्नुहोस् →' : 'Open in Voice Lab →'}
                         </button>
@@ -470,40 +468,40 @@ export default function HomePage() {
                         value={customParlerPrompt}
                         onChange={(e) => setCustomParlerPrompt(e.target.value)}
                         placeholder="A calm female speaker with Kathmandu Urban accent recorded in a soundproof studio..."
-                        className="w-full text-xs px-3 py-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-100 focus:outline-none focus:border-cyan-400 font-mono"
+                        className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-white border border-stone-200 text-stone-800 focus:outline-none focus:border-stone-400 font-mono shadow-xs"
                       />
                     </div>
                   )}
 
                   {/* Voice Tuning Panel (Collapsible Drawer) */}
-                  <div className="pt-2 border-t border-slate-800/80">
+                  <div className="pt-2 border-t border-stone-100">
                     <button
                       onClick={() => setIsTuningOpen(!isTuningOpen)}
                       id="toggle-tuning-drawer-btn"
-                      className="w-full py-2 flex items-center justify-between text-xs text-slate-400 hover:text-slate-200 transition-colors"
+                      className="w-full py-2 flex items-center justify-between text-xs text-stone-600 hover:text-stone-900 transition-colors cursor-pointer"
                     >
                       <span className="flex items-center gap-1.5 font-medium">
-                        <Sliders className="w-3.5 h-3.5 text-cyan-400" />
+                        <Sliders className="w-3.5 h-3.5 text-stone-700" />
                         {lang === 'ne'
                           ? 'स्वर परिमार्जन र गति सेटिङहरू (Voice Tuning Panel)'
                           : 'Voice Tuning & Inference Hyperparameters'}
                       </span>
                       {isTuningOpen ? (
-                        <ChevronUp className="w-4 h-4 text-slate-500" />
+                        <ChevronUp className="w-4 h-4 text-stone-400" />
                       ) : (
-                        <ChevronDown className="w-4 h-4 text-slate-500" />
+                        <ChevronDown className="w-4 h-4 text-stone-400" />
                       )}
                     </button>
 
                     {isTuningOpen && (
-                      <div className="p-4 mt-2 rounded-xl bg-[#0a0d14] border border-slate-800/80 space-y-4 animate-fadeIn">
+                      <div className="p-4 mt-2 rounded-2xl bg-stone-50/80 border border-stone-200/80 space-y-4 animate-fadeIn">
                         <div className="flex justify-between items-center mb-1">
-                          <span className="text-xs text-slate-400">
+                          <span className="text-xs text-stone-500 font-medium">
                             {lang === 'ne' ? 'परामिटर समायोजन' : 'Acoustic Control'}
                           </span>
                           <button
                             onClick={handleResetTuning}
-                            className="text-[11px] text-slate-500 hover:text-slate-300 flex items-center gap-1"
+                            className="text-[11px] text-stone-500 hover:text-stone-800 flex items-center gap-1 cursor-pointer"
                           >
                             <RotateCcw className="w-3 h-3" />
                             <span>{lang === 'ne' ? 'पूर्वनिर्धारित' : 'Reset Defaults'}</span>
@@ -513,10 +511,10 @@ export default function HomePage() {
                         {/* Slider 1: Pacing / Pause Multiplier (0.5x to 2.0x) */}
                         <div>
                           <div className="flex justify-between text-xs mb-1 font-mono">
-                            <span className="text-slate-300">
+                            <span className="text-stone-600">
                               {lang === 'ne' ? 'वाचन गति (Pacing Multiplier)' : 'Pacing / Pause Multiplier'}
                             </span>
-                            <span className="text-emerald-400 font-bold">{pacingMultiplier.toFixed(2)}x</span>
+                            <span className="text-stone-900 font-semibold">{pacingMultiplier.toFixed(2)}x</span>
                           </div>
                           <input
                             type="range"
@@ -525,9 +523,9 @@ export default function HomePage() {
                             step="0.05"
                             value={pacingMultiplier}
                             onChange={(e) => setPacingMultiplier(parseFloat(e.target.value))}
-                            className="w-full h-1.5 bg-slate-800 rounded appearance-none cursor-pointer accent-emerald-400"
+                            className="w-full h-1.5 bg-stone-200 rounded-full appearance-none cursor-pointer accent-stone-900"
                           />
-                          <div className="flex justify-between text-[10px] text-slate-500 font-mono mt-0.5">
+                          <div className="flex justify-between text-[10px] text-stone-400 font-mono mt-0.5">
                             <span>0.5x (Slow)</span>
                             <span>1.0x (Standard)</span>
                             <span>2.0x (Fast)</span>
@@ -537,10 +535,10 @@ export default function HomePage() {
                         {/* Slider 2: Temperature / Expression Exaggeration (0.1 to 1.0) */}
                         <div>
                           <div className="flex justify-between text-xs mb-1 font-mono">
-                            <span className="text-slate-300">
+                            <span className="text-stone-600">
                               {lang === 'ne' ? 'भावको तीव्रता (Expression Temperature)' : 'Expression Exaggeration'}
                             </span>
-                            <span className="text-cyan-400 font-bold">{temperature.toFixed(2)}</span>
+                            <span className="text-stone-900 font-semibold">{temperature.toFixed(2)}</span>
                           </div>
                           <input
                             type="range"
@@ -549,9 +547,9 @@ export default function HomePage() {
                             step="0.05"
                             value={temperature}
                             onChange={(e) => setTemperature(parseFloat(e.target.value))}
-                            className="w-full h-1.5 bg-slate-800 rounded appearance-none cursor-pointer accent-cyan-400"
+                            className="w-full h-1.5 bg-stone-200 rounded-full appearance-none cursor-pointer accent-stone-900"
                           />
-                          <div className="flex justify-between text-[10px] text-slate-500 font-mono mt-0.5">
+                          <div className="flex justify-between text-[10px] text-stone-400 font-mono mt-0.5">
                             <span>0.1 (Precise)</span>
                             <span>0.5 (Balanced)</span>
                             <span>1.0 (Dramatic)</span>
@@ -562,8 +560,8 @@ export default function HomePage() {
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <div className="flex justify-between text-xs mb-1 font-mono">
-                              <span className="text-slate-300">Repetition Penalty</span>
-                              <span className="text-slate-400">{repetitionPenalty.toFixed(2)}</span>
+                              <span className="text-stone-600">Repetition Penalty</span>
+                              <span className="text-stone-800 font-medium">{repetitionPenalty.toFixed(2)}</span>
                             </div>
                             <input
                               type="range"
@@ -572,14 +570,14 @@ export default function HomePage() {
                               step="0.05"
                               value={repetitionPenalty}
                               onChange={(e) => setRepetitionPenalty(parseFloat(e.target.value))}
-                              className="w-full h-1.5 bg-slate-800 rounded appearance-none cursor-pointer accent-slate-400"
+                              className="w-full h-1.5 bg-stone-200 rounded-full appearance-none cursor-pointer accent-stone-900"
                             />
                           </div>
 
                           <div>
                             <div className="flex justify-between text-xs mb-1 font-mono">
-                              <span className="text-slate-300">Top-K</span>
-                              <span className="text-slate-400">{topK}</span>
+                              <span className="text-stone-600">Top-K</span>
+                              <span className="text-stone-800 font-medium">{topK}</span>
                             </div>
                             <input
                               type="range"
@@ -588,7 +586,7 @@ export default function HomePage() {
                               step="5"
                               value={topK}
                               onChange={(e) => setTopK(parseInt(e.target.value, 10))}
-                              className="w-full h-1.5 bg-slate-800 rounded appearance-none cursor-pointer accent-slate-400"
+                              className="w-full h-1.5 bg-stone-200 rounded-full appearance-none cursor-pointer accent-stone-900"
                             />
                           </div>
                         </div>
@@ -598,29 +596,34 @@ export default function HomePage() {
 
                   {/* Status Notification if cold starting or using fallback */}
                   {ttsNotice && (
-                    <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-300 text-xs font-mono flex items-center gap-2 animate-fadeIn">
-                      <Info className="w-4 h-4 text-amber-400 shrink-0" />
+                    <div className="p-3 rounded-2xl bg-amber-50 border border-amber-200/80 text-amber-900 text-xs font-mono flex items-center gap-2 animate-fadeIn">
+                      <Info className="w-4 h-4 text-amber-600 shrink-0" />
                       <span>{ttsNotice}</span>
                     </div>
                   )}
 
-                  {/* High-visibility CTA button: "ध्वनि उत्पन्न गर्नुहोस्" */}
+                  {/* High-visibility Solid Pill CTA: ElevenLabs Aesthetic */}
                   <button
                     onClick={handleGenerateAudio}
                     disabled={isGenerating || !inputText.trim()}
                     id="generate-nepali-audio-btn"
-                    className="glow-button w-full py-4 rounded-xl bg-[#10b981] hover:bg-emerald-400 text-slate-950 font-extrabold text-sm md:text-base flex items-center justify-center gap-2.5 transition-all transform active:scale-[0.99] disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-[0_0_25px_rgba(16,185,129,0.35)]"
+                    className="w-full py-4 rounded-full bg-stone-900 hover:bg-black text-stone-50 font-medium text-sm md:text-base flex items-center justify-center gap-2.5 transition-all transform active:scale-[0.99] disabled:opacity-35 disabled:pointer-events-none cursor-pointer shadow-sm"
                   >
                     {isGenerating ? (
-                      <>
-                        <span className="w-5 h-5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
-                        <span className="animate-pulse">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-end gap-1 h-4">
+                          <span className="w-1 h-3 bg-stone-100 rounded-full animate-sine-1" />
+                          <span className="w-1 h-4 bg-stone-100 rounded-full animate-sine-2" />
+                          <span className="w-1 h-2 bg-stone-100 rounded-full animate-sine-3" />
+                          <span className="w-1 h-3.5 bg-stone-100 rounded-full animate-sine-4" />
+                        </div>
+                        <span className="text-stone-100 tracking-wide font-normal">
                           {lang === 'ne' ? 'आवाज उत्पन्न हुँदैछ...' : 'Synthesizing Nepali Speech...'}
                         </span>
-                      </>
+                      </div>
                     ) : (
                       <>
-                        <Zap className="w-5 h-5 fill-slate-950" />
+                        <Zap className="w-4 h-4 fill-stone-50 text-stone-50" />
                         <span>
                           {lang === 'ne'
                             ? 'ध्वनि उत्पन्न गर्नुहोस् (Generate Audio)'
@@ -631,10 +634,10 @@ export default function HomePage() {
                   </button>
 
                   {/* Creator Tier Active Card */}
-                  <div className="p-4 rounded-2xl bg-gradient-to-br from-[#10b981]/10 to-transparent border border-[#10b981]/20 flex items-center justify-between">
+                  <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200/80 flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-bold text-[#10b981] uppercase tracking-wider">Creator Tier Active</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5 font-mono">
+                      <p className="text-xs font-semibold text-stone-900 uppercase tracking-wider">Creator Tier Active</p>
+                      <p className="text-[11px] text-stone-500 mt-0.5 font-mono">
                         {creditsRemaining.toLocaleString()} {lang === 'ne' ? 'अक्षरहरू बाँकी' : 'characters remaining'}
                       </p>
                     </div>
@@ -644,7 +647,7 @@ export default function HomePage() {
                           setPricingModalMode('topup');
                           setIsPricingModalOpen(true);
                         }}
-                        className="text-xs px-3 py-1.5 rounded-lg bg-[#10b981]/20 hover:bg-[#10b981]/30 text-[#10b981] border border-[#10b981]/30 font-bold transition-all cursor-pointer"
+                        className="text-xs px-3.5 py-1.5 rounded-full bg-stone-900 hover:bg-black text-stone-50 font-medium transition-all cursor-pointer shadow-xs"
                       >
                         {lang === 'ne' ? 'क्रेडिट थप्नुहोस्' : 'Top Up'}
                       </button>
@@ -663,13 +666,13 @@ export default function HomePage() {
 
                 {/* Recent Synthesis History card */}
                 {generationHistory.length > 0 && (
-                  <div className="bg-[#111622] rounded-2xl border border-slate-800/80 p-5 shadow-xl">
+                  <div className="bg-white rounded-3xl border border-stone-200/80 p-5 shadow-editorial">
                     <div className="flex items-center justify-between mb-3">
-                      <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                        <History className="w-3.5 h-3.5 text-[#06b6d4]" />
+                      <h4 className="text-xs font-semibold uppercase tracking-wider text-stone-700 flex items-center gap-2">
+                        <History className="w-3.5 h-3.5 text-stone-800" />
                         {lang === 'ne' ? 'हालै संश्लेषित इतिहास' : 'Recent Generations'}
                       </h4>
-                      <span className="text-[11px] text-slate-500 font-mono">
+                      <span className="text-[11px] text-stone-400 font-mono">
                         {generationHistory.length} Sessions
                       </span>
                     </div>
@@ -682,25 +685,25 @@ export default function HomePage() {
                             setCurrentGeneration(gen);
                             setInputText(gen.rawText);
                           }}
-                          className={`p-3 rounded-xl border cursor-pointer flex items-center justify-between gap-3 transition-colors ${
+                          className={`p-3 rounded-2xl border cursor-pointer flex items-center justify-between gap-3 transition-colors ${
                             currentGeneration?.id === gen.id
-                              ? 'bg-slate-900 border-[#10b981]/50'
-                              : 'bg-slate-900/50 border-slate-800 hover:bg-slate-900 hover:border-slate-700'
+                              ? 'bg-stone-50 border-stone-900'
+                              : 'bg-white border-stone-200/70 hover:bg-stone-50'
                           }`}
                         >
                           <div className="min-w-0 flex-1">
-                            <p className="text-xs font-medium text-slate-200 truncate">
+                            <p className="text-xs font-medium text-stone-800 truncate">
                               {gen.rawText}
                             </p>
-                            <p className="text-[10px] text-slate-500 mt-0.5 flex items-center gap-2 font-mono">
-                              <span className="text-[#10b981] font-semibold">{gen.voice.nameNe}</span>
+                            <p className="text-[10px] text-stone-400 mt-0.5 flex items-center gap-2 font-mono">
+                              <span className="text-stone-700 font-medium">{gen.voice.nameNe}</span>
                               <span>•</span>
                               <span>{gen.duration.toFixed(1)}s</span>
                               <span>•</span>
                               <span>{gen.createdAt}</span>
                             </p>
                           </div>
-                          <div className="w-7 h-7 rounded-lg bg-slate-800 flex items-center justify-center text-slate-300 shrink-0">
+                          <div className="w-7 h-7 rounded-full bg-stone-100 border border-stone-200 flex items-center justify-center text-stone-700 shrink-0">
                             <Play className="w-3 h-3 translate-x-0.5" />
                           </div>
                         </div>
@@ -731,20 +734,20 @@ export default function HomePage() {
         )}
       </main>
 
-      {/* Immersive UI Footer */}
-      <footer className="h-14 bg-[#0d111b] border-t border-slate-800 px-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 font-mono gap-2 mt-auto">
+      {/* Minimalist Hairline UI Footer */}
+      <footer className="h-14 bg-white/70 backdrop-blur-md border-t border-stone-200/80 px-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-stone-500 font-mono gap-2 mt-auto">
         <div className="flex items-center gap-4 sm:gap-6 flex-wrap">
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse shadow-[0_0_6px_#10b981]" />
-            Status: <span className="text-[#10b981] font-semibold">Systems Operational</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            Status: <span className="text-stone-800 font-medium">Systems Operational</span>
           </span>
           <span>API v2.4.1</span>
-          <span>© 2025 Alphanex Technologies, Nepal</span>
+          <span>© 2025 KathaAI Indic Audio Studio</span>
         </div>
         <div className="flex items-center gap-4">
           <button
             onClick={() => setCurrentTab('developer')}
-            className="hover:text-white cursor-pointer transition-colors"
+            className="hover:text-stone-900 cursor-pointer transition-colors"
           >
             Documentation
           </button>
@@ -753,11 +756,11 @@ export default function HomePage() {
               setPricingModalMode('plans');
               setIsPricingModalOpen(true);
             }}
-            className="hover:text-white cursor-pointer transition-colors"
+            className="hover:text-stone-900 cursor-pointer transition-colors"
           >
             Plans
           </button>
-          <span className="hover:text-white cursor-pointer transition-colors">Privacy Policy</span>
+          <span className="hover:text-stone-900 cursor-pointer transition-colors">Privacy Policy</span>
         </div>
       </footer>
 

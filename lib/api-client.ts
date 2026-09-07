@@ -1,3 +1,5 @@
+import { WordTimestamp } from '@/types/tts';
+
 /**
  * KathaAI / Alphanex Indic TTS Client SDK
  * Direct typed interface to Next.js API route proxies and live FastAPI backend.
@@ -22,6 +24,7 @@ export interface SpeechResult {
   audioUrl: string;
   remainingCredits: number | null;
   duration: number | null;
+  timestamps: WordTimestamp[];
 }
 
 export interface UserCreditsResponse {
@@ -103,28 +106,47 @@ export async function generateSpeech(params: GenerateSpeechParams): Promise<Spee
     throw new Error(message);
   }
 
-  // Parse headers from the response stream
-  const rawRemaining = response.headers.get('X-Remaining-Credits');
-  const rawDuration = response.headers.get('X-Total-Duration');
+  const data = await response.json();
+
+  if (!data || !data.audio_base64) {
+    throw new Error('TTS synthesis failed: response missing audio data.');
+  }
+
+  // Decode base64 to Blob of type audio/wav
+  const rawBase64 = data.audio_base64.includes(',')
+    ? data.audio_base64.split(',')[1]
+    : data.audio_base64;
+  const binaryString = atob(rawBase64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  const blob = new Blob([bytes], { type: 'audio/wav' });
+  const audioUrl = URL.createObjectURL(blob);
 
   const remainingCredits =
-    rawRemaining && !isNaN(parseInt(rawRemaining, 10))
-      ? parseInt(rawRemaining, 10)
+    typeof data.remaining_credits === 'number' && !isNaN(data.remaining_credits)
+      ? data.remaining_credits
+      : typeof data.remainingCredits === 'number' && !isNaN(data.remainingCredits)
+      ? data.remainingCredits
       : null;
 
   const duration =
-    rawDuration && !isNaN(parseFloat(rawDuration))
-      ? parseFloat(rawDuration)
+    typeof data.duration === 'number' && !isNaN(data.duration)
+      ? data.duration
       : null;
 
-  const blob = await response.blob();
-  const audioUrl = URL.createObjectURL(blob);
+  const timestamps: WordTimestamp[] = Array.isArray(data.timestamps)
+    ? data.timestamps
+    : [];
 
   return {
     blob,
     audioUrl,
     remainingCredits,
     duration,
+    timestamps,
   };
 }
 
