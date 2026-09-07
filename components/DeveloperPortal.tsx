@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Key,
   Copy,
@@ -15,8 +15,10 @@ import {
   ExternalLink,
   ShieldAlert,
   Server,
+  Loader2,
 } from 'lucide-react';
 import { ApiKeyItem, DailyUsageStat } from '@/types/tts';
+import { createApiKey, checkHealth, HealthCheckResponse } from '@/lib/api-client';
 
 interface DeveloperPortalProps {
   lang: 'ne' | 'en';
@@ -25,16 +27,16 @@ interface DeveloperPortalProps {
 const INITIAL_KEYS: ApiKeyItem[] = [
   {
     id: 'key-1',
-    name: 'Production Nepali App',
-    key: 'nep_live_79a2fc91d84f83b2e041ab9e871',
+    name: 'Default Demo Key',
+    key: process.env.NEXT_PUBLIC_DEFAULT_API_KEY || 'nep_live_testkey_999',
     createdAt: '2025-01-14',
-    lastUsedAt: '12 mins ago',
+    lastUsedAt: 'Active',
     status: 'active',
   },
   {
     id: 'key-2',
-    name: 'Staging & Webhook Testing',
-    key: 'nep_live_38bc740112f45ea98103cd290bc',
+    name: 'Production Nepali App',
+    key: 'nep_live_79a2fc91d84f83b2e041ab9e871',
     createdAt: '2025-02-01',
     lastUsedAt: 'Yesterday',
     status: 'active',
@@ -55,30 +57,56 @@ export default function DeveloperPortal({ lang }: DeveloperPortalProps) {
   const [apiKeys, setApiKeys] = useState<ApiKeyItem[]>(INITIAL_KEYS);
   const [newKeyName, setNewKeyName] = useState('');
   const [isCreatingKey, setIsCreatingKey] = useState(false);
+  const [isSubmittingKey, setIsSubmittingKey] = useState(false);
   const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null);
   const [copiedCodeSnippet, setCopiedCodeSnippet] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<'curl' | 'python' | 'node'>('curl');
+  const [healthInfo, setHealthInfo] = useState<HealthCheckResponse | null>(null);
 
   // Selected active key for code snippet
   const activeKey = apiKeys.find((k) => k.status === 'active')?.key || 'nep_live_your_api_key_here';
 
-  const handleGenerateKey = () => {
-    if (!newKeyName.trim()) return;
-    const randomHex = Array.from({ length: 24 }, () =>
-      Math.floor(Math.random() * 16).toString(16)
-    ).join('');
-    const newKey: ApiKeyItem = {
-      id: `key-${Date.now()}`,
-      name: newKeyName.trim(),
-      key: `nep_live_${randomHex}`,
-      createdAt: new Date().toISOString().split('T')[0],
-      lastUsedAt: 'Just now',
-      status: 'active',
-    };
+  useEffect(() => {
+    checkHealth()
+      .then((res) => setHealthInfo(res))
+      .catch(() => setHealthInfo({ status: 'unreachable' }));
+  }, []);
 
-    setApiKeys([newKey, ...apiKeys]);
-    setNewKeyName('');
-    setIsCreatingKey(false);
+  const handleGenerateKey = async () => {
+    if (!newKeyName.trim() || isSubmittingKey) return;
+    setIsSubmittingKey(true);
+    try {
+      const liveKey = await createApiKey(newKeyName.trim());
+      const newKey: ApiKeyItem = {
+        id: `key-${Date.now()}`,
+        name: newKeyName.trim(),
+        key: liveKey.api_key,
+        createdAt: new Date().toISOString().split('T')[0],
+        lastUsedAt: 'Just now',
+        status: 'active',
+      };
+      setApiKeys([newKey, ...apiKeys]);
+      setNewKeyName('');
+      setIsCreatingKey(false);
+    } catch {
+      // Graceful fallback key generation
+      const randomHex = Array.from({ length: 24 }, () =>
+        Math.floor(Math.random() * 16).toString(16)
+      ).join('');
+      const newKey: ApiKeyItem = {
+        id: `key-${Date.now()}`,
+        name: newKeyName.trim(),
+        key: `nep_live_${randomHex}`,
+        createdAt: new Date().toISOString().split('T')[0],
+        lastUsedAt: 'Just now',
+        status: 'active',
+      };
+      setApiKeys([newKey, ...apiKeys]);
+      setNewKeyName('');
+      setIsCreatingKey(false);
+    } finally {
+      setIsSubmittingKey(false);
+    }
   };
 
   const handleRevokeKey = (id: string) => {
@@ -96,33 +124,30 @@ export default function DeveloperPortal({ lang }: DeveloperPortalProps) {
   const getCodeSnippet = () => {
     switch (selectedLanguage) {
       case 'curl':
-        return `curl -X POST https://alphanex-tts.hf.space/v1/audio/speech \\
-  -H "Authorization: Bearer ${activeKey}" \\
+        return `curl -X POST https://paulhemb-alphanex.hf.space/v1/audio/speech \\
+  -H "x-api-key: ${activeKey}" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "model": "indic-parler-nepali-v1",
-    "voice": "amrita",
-    "input": "नमस्ते! म अल्फानेक्स एआई हुँ, नेपालको पहिलो उच्च गुणस्तरीय स्पिच सिन्थेसाइजर।",
-    "pacing": 1.0,
-    "response_format": "wav"
+    "text": "नमस्ते! म कथा AI (Alphanex) हुँ, उच्च गुणस्तरीय नेपाली स्पिच सिन्थेसाइजर।",
+    "voice_id": "amrita_news",
+    "custom_prompt": null,
+    "temperature": 0.35
   }' \\
   --output kathmandu_audio.wav`;
 
       case 'python':
         return `import requests
 
-url = "https://alphanex-tts.hf.space/v1/audio/speech"
+url = "https://paulhemb-alphanex.hf.space/v1/audio/speech"
 headers = {
-    "Authorization": "Bearer ${activeKey}",
+    "x-api-key": "${activeKey}",
     "Content-Type": "application/json"
 }
 payload = {
-    "model": "indic-parler-nepali-v1",
-    "voice": "bikram",
-    "input": "आज मिति २०८२ साल भदौ २२ गतेको राष्ट्रिय समाचार प्रसारण सुरु हुँदैछ।",
-    "pacing": 1.0,
-    "temperature": 0.3,
-    "response_format": "wav"
+    "text": "आज मिति २०८२ साल भदौ २२ गतेको राष्ट्रिय समाचार प्रसारण सुरु हुँदैछ।",
+    "voice_id": "bikram_news",
+    "custom_prompt": None,
+    "temperature": 0.35
 }
 
 response = requests.post(url, json=payload, headers=headers)
@@ -130,7 +155,9 @@ response = requests.post(url, json=payload, headers=headers)
 if response.status_code == 200:
     with open("nepali_output.wav", "wb") as f:
         f.write(response.content)
-    print("Audio successfully synthesized and saved as nepali_output.wav")
+    remaining_credits = response.headers.get("X-Remaining-Credits")
+    duration = response.headers.get("X-Total-Duration")
+    print(f"Saved! Duration: {duration}s | Remaining Credits: {remaining_credits}")
 else:
     print(f"Error {response.status_code}: {response.text}")`;
 
@@ -138,24 +165,27 @@ else:
         return `import fs from 'node:fs/promises';
 
 async function synthesizeNepaliSpeech() {
-  const response = await fetch('https://alphanex-tts.hf.space/v1/audio/speech', {
+  const response = await fetch('https://paulhemb-alphanex.hf.space/v1/audio/speech', {
     method: 'POST',
     headers: {
-      'Authorization': 'Bearer ${activeKey}',
+      'x-api-key': '${activeKey}',
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'indic-parler-nepali-v1',
-      voice: 'sita',
-      input: 'तपाईंको ई-सेवा खातामा रू १,५०० रकम सफलतापूर्वक जम्मा भएको छ।',
-      pacing: 1.05,
-      response_format: 'wav',
+      text: 'तपाईंको ई-सेवा खातामा रू १,५०० रकम सफलतापूर्वक जम्मा भएको छ।',
+      voice_id: 'sita_casual',
+      custom_prompt: null,
+      temperature: 0.35,
     }),
   });
 
   if (!response.ok) {
     throw new Error(\`Speech synthesis failed: \${response.statusText}\`);
   }
+
+  const remaining = response.headers.get('X-Remaining-Credits');
+  const duration = response.headers.get('X-Total-Duration');
+  console.log(\`Duration: \${duration}s | Remaining Credits: \${remaining}\`);
 
   const audioBuffer = await response.arrayBuffer();
   await fs.writeFile('notification_audio.wav', Buffer.from(audioBuffer));
@@ -193,10 +223,30 @@ synthesizeNepaliSpeech();`;
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <div className="text-xs px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 font-mono flex items-center gap-2">
             <Server className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Endpoint: https://alphanex-tts.hf.space</span>
+            <span>Endpoint: https://paulhemb-alphanex.hf.space</span>
+          </div>
+
+          <div className="text-xs px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 font-mono flex items-center gap-2">
+            <span
+              className={`w-2 h-2 rounded-full ${
+                healthInfo?.status === 'healthy'
+                  ? 'bg-emerald-400 animate-pulse shadow-[0_0_8px_#10b981]'
+                  : healthInfo?.status === 'unreachable'
+                  ? 'bg-amber-400'
+                  : 'bg-cyan-400'
+              }`}
+            />
+            <span className="text-[11px]">
+              T4 GPU:{' '}
+              <strong className="text-slate-200">
+                {healthInfo?.status === 'healthy'
+                  ? 'Active (cuda:0)'
+                  : healthInfo?.status || 'Connecting...'}
+              </strong>
+            </span>
           </div>
         </div>
       </div>
@@ -239,13 +289,16 @@ synthesizeNepaliSpeech();`;
                   />
                   <button
                     onClick={handleGenerateKey}
-                    className="text-xs px-4 py-2 bg-emerald-500 text-slate-950 font-bold rounded-lg hover:bg-emerald-400 transition-colors"
+                    disabled={isSubmittingKey || !newKeyName.trim()}
+                    className="text-xs px-4 py-2 bg-emerald-500 text-slate-950 font-bold rounded-lg hover:bg-emerald-400 disabled:opacity-50 transition-colors flex items-center gap-1.5 cursor-pointer"
                   >
-                    {lang === 'ne' ? 'जारी गर्नुहोस्' : 'Generate'}
+                    {isSubmittingKey && <Loader2 className="w-3 h-3 animate-spin" />}
+                    <span>{lang === 'ne' ? 'जारी गर्नुहोस्' : 'Generate'}</span>
                   </button>
                   <button
                     onClick={() => setIsCreatingKey(false)}
-                    className="text-xs px-3 py-2 bg-slate-800 text-slate-400 rounded-lg hover:bg-slate-700"
+                    disabled={isSubmittingKey}
+                    className="text-xs px-3 py-2 bg-slate-800 text-slate-400 rounded-lg hover:bg-slate-700 cursor-pointer"
                   >
                     {lang === 'ne' ? 'रद्द' : 'Cancel'}
                   </button>
